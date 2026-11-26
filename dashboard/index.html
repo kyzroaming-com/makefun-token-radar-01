@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token Radar: pre-token protocols ranked by implied value</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#board">Skip to the board</a>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="kicker">Token launch radar &middot; model radar-2</p>
+    <h1>Which pre-token protocol is worth farming next?</h1>
+    <p class="lede" id="lede">Loading the board&hellip;</p>
+  </div>
+</header>
+<main id="board" tabindex="-1">
+  <section class="toolbar" aria-label="Board controls">
+    <label class="field">Search
+      <input id="q" type="search" placeholder="Protocol name or slug" autocomplete="off">
+    </label>
+    <label class="field">Chain
+      <select id="chain"><option value="">All chains</option></select>
+    </label>
+    <label class="field">Category
+      <select id="category"><option value="">All categories</option></select>
+    </label>
+    <label class="check"><input id="watchlist" type="checkbox"> Watchlist only</label>
+    <p class="count" id="count" aria-live="polite"></p>
+  </section>
+
+  <section id="detail" class="detail" hidden aria-label="Protocol detail"></section>
+
+  <section class="table-wrap">
+    <table id="board-table">
+      <thead>
+        <tr>
+          <th><button data-sort="rank" aria-sort="ascending">Rank</button></th>
+          <th><button data-sort="name">Protocol</button></th>
+          <th><button data-sort="category">Category</button></th>
+          <th><button data-sort="chains">Chains</button></th>
+          <th class="num"><button data-sort="tvl_usd">TVL</button></th>
+          <th class="num"><button data-sort="change_7d">7d</button></th>
+          <th class="num"><button data-sort="age_days">Age</button></th>
+          <th class="num"><button data-sort="implied_value_usd">Implied value</button></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p class="hint">Click a row to open its detail view and farm plan. Click a column heading to sort.</p>
+  </section>
+
+  <section class="live" aria-label="Live token protocols">
+    <h2>Live tokens: the market&rsquo;s own values</h2>
+    <p>These protocols already trade, so they are not ranked. They are the comparables the
+    model&rsquo;s multiples come from: the board&rsquo;s base multiple for a category is the median
+    market-cap-to-TVL ratio of the live-token protocols in that category.</p>
+    <table id="live-table">
+      <thead>
+        <tr><th>Protocol</th><th>Category</th><th>Chains</th><th class="num">TVL</th><th class="num">Market cap</th><th class="num">7d</th></tr>
+      </thead>
+      <tbody id="live-rows"></tbody>
+    </table>
+  </section>
+
+  <section class="method" aria-label="How the radar works">
+    <h2>How the radar works</h2>
+    <p>Every row is a protocol that <strong>records no token</strong> in the snapshot and is not a
+    wrapped, staked or bridged product of a token that already trades. That is the watchlist&rsquo;s
+    own exclusion logic, applied to the whole snapshot instead of only to its $50M floor, so the
+    board ranks all 40 watchlist protocols plus every other protocol that passes the same test.</p>
+    <p>Implied value is the entry&rsquo;s own claim, never make.fun&rsquo;s, and it follows only from
+    the snapshot&rsquo;s figures:</p>
+    <p class="formula"><code>implied = TVL &times; category multiple &times; growth multiplier &times; maturity multiplier</code></p>
+    <ul>
+      <li><strong>Category multiple:</strong> the median market-cap-to-TVL ratio of the snapshot&rsquo;s
+      live-token protocols in the same category, clamped to 0.05&ndash;2.00. A category with fewer than
+      five live comparables uses the global median. The multiples table below shows every category&rsquo;s
+      multiple and how many live protocols it came from.</li>
+      <li><strong>Growth multiplier:</strong> 1 + clamp(7-day TVL change, &minus;60%, +120%) &divide; 100 &times; 0.5.</li>
+      <li><strong>Maturity multiplier:</strong> 0.6 + min(age in days, 1095) &divide; 1095 &times; 0.4;
+      a protocol with no listing date is scored at 365 days.</li>
+    </ul>
+    <p>Each farm plan is generated from the protocol&rsquo;s own record &mdash; its category, its
+    chains, its TVL and its age &mdash; and every step names what it costs and how long it takes.
+    The plan is a starting point, not advice: a launch is never guaranteed, and the board does not
+    predict whether or when a token is issued.</p>
+    <h3>Category multiples used</h3>
+    <table id="multiples-table">
+      <thead><tr><th>Category</th><th class="num">Multiple</th><th class="num">Live comparables</th></tr></thead>
+      <tbody id="multiples-rows"></tbody>
+    </table>
+    <p class="fine">Source: DefiLlama protocols, fetched once for the sealed snapshot. The snapshot
+    carries no ranking, no implied value and no farm plan; deriving them is this entry&rsquo;s work.</p>
+  </section>
+</main>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
